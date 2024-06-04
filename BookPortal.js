@@ -1,10 +1,10 @@
 const readlineSync = require('readline-sync')
 var BookDetails = [
     {
-      bookId : 10,
+      bookId : 10 ,
       bookName : "The Best of Us ",
       price : 100,
-      bookStatus : "Avalilable",
+      bookStatus : "Available",
       quantity : 1
     },
     {
@@ -18,14 +18,14 @@ var BookDetails = [
         bookId : 12,
         bookName : "Half Girlfriend",
         price : 500,
-        bookStatus : "Avalilable",
+        bookStatus : "Available",
         quantity : 2
       },
       {
         bookId : 13,
         bookName : "The God of Small Things ",
         price : 100,
-        bookStatus : "Avalilable",
+        bookStatus : "Available",
         quantity : 1
       },
       {
@@ -46,14 +46,14 @@ var BookDetails = [
         bookId : 16,
         bookName : "The 3 Mistakes of My Life",
         price : 300,
-        bookStatus : "Avalilable",
+        bookStatus : "Available",
         quantity : 1
       },
       {
         bookId : 17,
         bookName : "The Namesake",
         price : 500,
-        bookStatus : "Avalilable",
+        bookStatus : "Available",
         quantity : 1
       },
       {
@@ -64,10 +64,80 @@ var BookDetails = [
         quantity : 3
       }
 ]
-
+var cart = []
 function mainMenu() {
     console.log("1 Show available Books");
     console.log("2 Add Book")
     console.log("3 Show cart");
+    console.log("4 Exit from the choice");
+    const choice = readlineSync.question("Please select an option: ")
+
+switch (choice) {
+  case '1':
+    showBooks()
+  
+    break;
+  case '2':
+    addBooks()
+    break
+  case '3':
+    showCart()
+    break
+  case '4' :
+    return
+  default:
+    console.log("You entered invalid choice");
+    break;
 }
-const choice = readlineSync.question("Please select an option: ")
+}
+
+mainMenu()
+function showBooks() {
+  console.log("Available Books to buy: ");
+  BookDetails.forEach(book => {
+    if(book.bookStatus === "Available")
+      {
+        console.log()
+        console.log(`Book Id : ${book.bookId}`)
+        console.log(`Name : ${book.bookName} `)
+        console.log(`Price : ${book.price} ` ) 
+        console.log(`Quantity: ${book.quantity}`);
+        console.log("-----------------------------------")
+
+      }
+  })
+}
+mainMenu()
+function addBooks() {
+  const bookId = parseInt(readlineSync.question("Enter the book ID to add to cart: "));
+    const book = BookDetails.find(book => book.bookId === bookId);
+
+    if (book && book.bookStatus === "Available" && book.quantity > 0) {
+        cart.push({
+            bookId: book.bookId,
+            bookName: book.bookName,
+            price: book.price,
+            quantity: 1
+        });
+        book.quantity -= 1;
+
+        if (book.quantity === 0) {
+            book.bookStatus = "Unavailable";
+        }
+
+        console.log(`Book "${book.bookName}" added to the cart.`);
+    } else {
+        console.log("Book is not available or invalid book ID.");
+    }
+}
+mainMenu()
+function showCart() {
+  console.log("Cart Contents:");
+  if (cart.length === 0) {
+      console.log("Your cart is empty.");
+  } else {
+      cart.forEach(item => {
+          console.log(`ID: ${item.bookId}, Name: ${item.bookName}, Price: ${item.price}, Quantity: ${item.quantity}`);
+      });
+  }
+}
