@@ -12,14 +12,14 @@ var BookDetails = [
         bookName : "One Indian Girl",
         price : 200,
         bookStatus : "Unavalilable",
-        quantity : 3
+        quantity : 1
       },
       {
         bookId : 12,
         bookName : "Half Girlfriend",
         price : 500,
         bookStatus : "Available",
-        quantity : 2
+        quantity : 1
       },
       {
         bookId : 13,
@@ -33,14 +33,14 @@ var BookDetails = [
         bookName : "The White Tiger ",
         price : 400,
         bookStatus : "Unavalilable",
-        quantity : 2
+        quantity : 1
       },
       {
         bookId : 15,
         bookName : "Revolution 2020",
         price : 100,
         bookStatus : "Unavalilable",
-        quantity : 2
+        quantity : 1
       },
       {
         bookId : 16,
@@ -54,14 +54,14 @@ var BookDetails = [
         bookName : "The Namesake",
         price : 500,
         bookStatus : "Available",
-        quantity : 1
+        quantity : 5
       },
       {
         bookId : 18,
         bookName : "The Palace of Illusions",
         price : 600,
         bookStatus : "Unavalilable",
-        quantity : 3
+        quantity : 1
       }
 ]
 var cart = []
@@ -75,7 +75,6 @@ function mainMenu() {
 switch (choice) {
   case '1':
     showBooks()
-  
     break;
   case '2':
     addBooks()
@@ -92,10 +91,16 @@ switch (choice) {
 }
 
 mainMenu()
+
 function showBooks() {
   console.log("Available Books to buy: ");
   BookDetails.forEach(book => {
-    if(book.bookStatus === "Available")
+    if(book.quantity > 0)
+    book.bookStatus = "Available"
+  else {
+    book.bookStatus = "Unavailable"
+  }
+  if(book.bookStatus === "Available")
       {
         console.log()
         console.log(`Book Id : ${book.bookId}`)
@@ -108,36 +113,44 @@ function showBooks() {
   })
 }
 mainMenu()
+
 function addBooks() {
   const bookId = parseInt(readlineSync.question("Enter the book ID to add to cart: "));
-    const book = BookDetails.find(book => book.bookId === bookId);
+  const book = BookDetails.find(book => book.bookId === bookId);
 
-    if (book && book.bookStatus === "Available" && book.quantity > 0) {
-        cart.push({
-            bookId: book.bookId,
-            bookName: book.bookName,
-            price: book.price,
-            quantity: 1
-        });
-        book.quantity -= 1;
+  if (book && book.bookStatus === "Available" && book.quantity > 0) {
+      const quantity = parseInt(readlineSync.question(`Enter the quantity to add to cart (Available: ${book.quantity}): `));
+      
+      if (quantity > 0 && quantity <= book.quantity) {
+          cart.push({
+              bookId: book.bookId,
+              bookName: book.bookName,
+              price: book.price,
+              quantity: quantity
+          });
+          book.quantity -= quantity;
 
-        if (book.quantity === 0) {
-            book.bookStatus = "Unavailable";
-        }
-
-        console.log(`Book "${book.bookName}" added to the cart.`);
-    } else {
-        console.log("Book is not available or invalid book ID.");
-    }
+          console.log(`Book "${book.bookName}" added to the cart. Quantity: ${quantity}`);
+      } else {
+          console.log("Invalid quantity. Please enter a quantity within the available range.");
+      }
+  } else {
+      console.log("Book is not available or invalid book ID.");
+  }
 }
 mainMenu()
 function showCart() {
-  console.log("Cart Contents:");
+  console.log("Cart Items:");
   if (cart.length === 0) {
       console.log("Your cart is empty.");
   } else {
+    let totalCartValue = 0;
       cart.forEach(item => {
-          console.log(`ID: ${item.bookId}, Name: ${item.bookName}, Price: ${item.price}, Quantity: ${item.quantity}`);
+        const totalPrice = item.price * item.quantity;
+        totalCartValue += totalPrice;
+          console.log(`ID: ${item.bookId}, Name: ${item.bookName}, Price: ${item.price}, Quantity: ${item.quantity}, Total Price: ${totalPrice}`);
       });
+      console.log(`Total Cart Value: ${totalCartValue}`);
   }
 }
+mainMenu()
