@@ -5,7 +5,7 @@ var BookDetails = [
     bookName: "The Best of Us ",
     price: 100,
     bookStatus: "Available",
-    quantity: 1
+    quantity: 3
   },
   {
     bookId: 11,
@@ -65,11 +65,14 @@ var BookDetails = [
   }
 ]
 var cart = []
+let updateInput
+
 function mainMenu() {
   console.log("1 Show available Books");
   console.log("2 Add Book")
   console.log("3 Show cart");
-  console.log("4 Exit from the choice");
+  console.log("4 Update Cart")
+  console.log("5 Exit from the choice");
   const choice = readlineSync.question("Please select an option: ")
 
   switch (choice) {
@@ -83,6 +86,9 @@ function mainMenu() {
       showCart()
       break
     case '4':
+      updateCart()
+      break
+    case '5':
       return
     default:
       console.log("You entered invalid choice");
@@ -163,3 +169,90 @@ function showCart() {
   }
 }
 mainMenu()
+
+
+
+function updateCart() {
+  if (cart.length > 0) {
+      const updateInput = parseInt(readlineSync.question("Enter the book ID you want to update: "));
+      const cartItem = cart.find(book => book.bookId === updateInput);
+
+      if (cartItem) {
+          console.log("Choose the kind of operation you want to perform:");
+          console.log("1. Increase the quantity");
+          console.log("2. Decrease the quantity");
+          console.log("3. Remove");
+          const select = readlineSync.question("Select the option: ");
+          switch (select) {
+              case "1":
+                  increaseQuantity(cartItem);
+                  break;
+              case "2":
+                  decreaseQuantity(cartItem);
+                  break;
+              case "3":
+                  removeFromTheCart(cartItem);
+                  break;
+              default:
+                  console.log("You entered an invalid choice");
+                  break;
+          }
+      } else {
+          console.log("This Book is not available inside your cart");
+          updateCart();
+      }
+  } else {
+      console.log("You don't have anything in the cart!!! Kindly add the item");
+  }
+}
+
+function increaseQuantity(cartItem) {
+  while (true) {
+    console.log("Enter The Increase Quantity");
+    let increaseInput = parseInt(readlineSync.question());
+
+    const book = BookDetails.find(mainBook => mainBook.bookId === cartItem.bookId);
+      if (increaseInput <= book.quantity) {
+          cartItem.quantity += increaseInput;
+          book.quantity -= increaseInput;
+          console.log("Successfully increased");
+          console.log(cart);
+          console.log(book);
+          break;
+      } else {
+          if (book.quantity === 0) {
+              console.log("It is unavailable, you can't increase");
+              break;
+          } else {
+              console.log(`That much quantity is not there, only ${book.quantity} pcs available`);
+          }
+      }
+  }
+}
+
+function decreaseQuantity(cartItem) {
+  const decreaseValue = parseInt(readlineSync.question("Enter the decrease quantity: "));
+  const book = BookDetails.find(mainBook => mainBook.bookId === cartItem.bookId);
+  if (book) {
+      if (decreaseValue > 0 && decreaseValue <= cartItem.quantity) {
+          cartItem.quantity -= decreaseValue;
+          book.quantity += decreaseValue;
+          if (cartItem.quantity === 0) {
+              removeFromTheCart(cartItem);
+          } else {
+              console.log(`Decreased the quantity by ${decreaseValue}. New quantity: ${cartItem.quantity}`);
+          }
+      } else {
+          console.log(`Invalid quantity. Please enter a quantity within the available range (In cart: ${cartItem.quantity}).`);
+      }
+  }
+}
+
+function removeFromTheCart(cartItem) {
+  const book = BookDetails.find(mainBook => mainBook.bookId === cartItem.bookId);
+  if (book) {
+      book.quantity += cartItem.quantity;
+      cart = cart.filter(item => item.bookId !== cartItem.bookId);
+      console.log(`Removed book "${cartItem.bookName}" from the cart.`);
+  }
+}
